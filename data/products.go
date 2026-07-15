@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// Product defines the structure for an API
 type Product struct {
 	ID          int     `json:"id"`
 	Name        string  `json:"name"`
@@ -17,7 +18,13 @@ type Product struct {
 	DeletedOn   string  `json:"_"`
 }
 
+// Products is a collection of Product
 type Products []*Product
+
+func (p *Product) FromJSON(r io.Reader) error {
+	e := json.NewDecoder(r)
+	return e.Decode(p)
+}
 
 func (p *Products) ToJSON(w io.Writer) error {
 	e := json.NewEncoder(w)
@@ -26,6 +33,16 @@ func (p *Products) ToJSON(w io.Writer) error {
 
 func GetProducts() Products {
 	return productList
+}
+
+func AddProduct(p *Product) {
+	p.ID = getNextID()
+	productList = append(productList, p)
+}
+
+func getNextID() int {
+	lp := productList[len(productList)-1]
+	return lp.ID + 1
 }
 
 var productList = []*Product{
