@@ -53,12 +53,35 @@ func (p *Products) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid URI", http.StatusBadRequest)
 			return
 		}
-		p.l.Println("PUT got the ID: ", id)
 
+		p.updateProduct(id, w, r)
+		return
 	}
 
 	// catch all
 	w.WriteHeader(http.StatusMethodNotAllowed)
+}
+
+func (p *Products) updateProduct(id int, w http.ResponseWriter, r *http.Request) {
+	p.l.Println("Handle PUT Product")
+
+	prod := &data.Product{}
+	err := prod.FromJSON(r.Body)
+
+	if err != nil {
+		http.Error(w, "Unable to un marshal json", http.StatusBadRequest)
+	}
+
+	err = data.UpdateProduct(id, prod)
+	if err == data.ErrProductNotFound {
+		http.Error(w, "Product not found", http.StatusNotFound)
+		return
+	}
+
+	if err != nil {
+		http.Error(w, "Product not found", http.StatusInternalServerError)
+		return
+	}
 }
 
 // getProducts returns the products from the data store
