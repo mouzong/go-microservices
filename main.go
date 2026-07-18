@@ -16,12 +16,12 @@ func main() {
 
 	hh := handlers.NewHello(l)
 	gh := handlers.NewGoodbye(l)
-	ph := handlers.NewProdcut(l)
+	ph := handlers.NewProduct(l)
 
 	sm := http.NewServeMux()
 	sm.Handle("/", hh)
-	sm.Handle("/goodbye", gh)
-	sm.Handle("/products", ph)
+	sm.Handle("/goodbye/", gh)
+	sm.Handle("/products/", ph)
 
 	s := &http.Server{
 		Addr:         ":9070",
@@ -38,6 +38,7 @@ func main() {
 		}
 	}()
 
+	l.Println("Server started, listening on port", s.Addr)
 	sigChan := make(chan os.Signal)
 	signal.Notify(sigChan, os.Interrupt)
 	signal.Notify(sigChan, os.Kill)
